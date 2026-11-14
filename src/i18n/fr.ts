@@ -63,7 +63,7 @@ export const fr: Copy = {
     pdf: {
       eyebrow: 'Import PDF',
       title: 'Éditez un planning depuis un PDF.',
-      sub: 'Importez un planning reçu en PDF et modifiez-le.',
+      sub: 'Importez un planning reçu en PDF et modifiez‑le.',
     },
     ai: {
       eyebrow: 'Assistant',

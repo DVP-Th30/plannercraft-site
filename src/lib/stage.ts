@@ -51,6 +51,7 @@ export function initStage(root: HTMLElement): void {
   const canvas = root.querySelector<HTMLCanvasElement>('.stage__canvas');
   const hero = root.querySelector<HTMLElement>('.hero__content');
   const pitch = root.querySelector<HTMLElement>('.pitch');
+  const column = pitch?.querySelector<HTMLElement>('.wrap') ?? null;
   const ctx = canvas?.getContext('2d');
   if (!sticky || !canvas || !hero || !pitch || !ctx) return;
   window.__pcStage = true;
@@ -84,13 +85,21 @@ export function initStage(root: HTMLElement): void {
     canvas!.height = Math.round(H * dpr);
     scale = Math.max(W / DESIGN_W, H / DESIGN_H);
 
-    const gutter = W < 720 ? 16 : 32;
-    const cw = Math.min(W - 2 * gutter, 1120);
-    const cx0 = (W - cw) / 2;
+    // Le planning s'aligne sur la colonne de texte du titre (le `.wrap` de la page).
+    let cx0 = W < 720 ? 16 : 32;
+    let cw = W - 2 * cx0;
+    if (column) {
+      const box = column.getBoundingClientRect();
+      const style = getComputedStyle(column);
+      const padLeft = parseFloat(style.paddingLeft) || 0;
+      const padRight = parseFloat(style.paddingRight) || 0;
+      cx0 = box.left - rect.left + padLeft;
+      cw = box.width - padLeft - padRight;
+    }
     const showLabels = W >= 760;
     const labelW = showLabels ? Math.min(230, cw * 0.24) : 0;
     const pitchBottom = pitch!.offsetTop + pitch!.offsetHeight;
-    const top = Math.max(H * 0.43, pitchBottom + 28);
+    const top = pitchBottom + Math.max(28, H * 0.06);
     const bottom = H - Math.max(28, H * 0.06);
     const rowH = Math.max(14, Math.min((bottom - top) / rows, 56));
     chart = {
