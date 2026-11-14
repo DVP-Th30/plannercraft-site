@@ -1,0 +1,274 @@
+---
+// Quatre blocs de couleur : légèreté, version navigateur, import PDF, assistant IA.
+import type { Copy } from '../i18n';
+import { SITE } from '../config';
+
+interface Props {
+  copy: Copy;
+}
+const { copy } = Astro.props;
+const t = copy.tiles;
+---
+
+<section class="section">
+  <div class="wrap tiles">
+    <article class="tile tile--ink" data-reveal>
+      <p class="tile__eyebrow">{t.light.eyebrow}</p>
+      <p class="figure" aria-hidden="true">{t.light.figure}</p>
+      <div class="tile__text">
+        <h3>{t.light.title}</h3>
+        <p>{t.light.sub}</p>
+      </div>
+    </article>
+
+    <article class="tile tile--orange" id="browser" data-reveal style="--reveal-delay: 0.08s">
+      <p class="tile__eyebrow">{t.browser.eyebrow}</p>
+      <div class="window" aria-hidden="true">
+        <div class="window__bar"><i></i><i></i><i></i><span>plannercraft.app/app</span></div>
+        <div class="window__body">
+          <span style="width: 46%; background: var(--violet)"></span>
+          <span style="width: 30%; margin-left: 22%; background: var(--cyan)"></span>
+          <span style="width: 38%; margin-left: 48%; background: var(--green)"></span>
+        </div>
+      </div>
+      <div class="tile__text">
+        <h3>{t.browser.title}</h3>
+        <p>{t.browser.sub}</p>
+        <a class="btn" href={SITE.webApp}>{t.browser.cta}</a>
+      </div>
+    </article>
+
+    <article class="tile tile--cyan" data-reveal>
+      <p class="tile__eyebrow">{t.pdf.eyebrow}</p>
+      <div class="pdf" aria-hidden="true">
+        <div class="pdf__sheet"><b>PDF</b><i></i><i></i><i></i></div>
+        <svg width="44" height="24" viewBox="0 0 44 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h38"></path><path d="M31 3l9 9-9 9"></path></svg>
+        <div class="pdf__bars">
+          <span style="width: 62%; background: var(--violet)"></span>
+          <span style="width: 44%; margin-left: 30%; background: var(--yellow)"></span>
+          <span style="width: 40%; margin-left: 60%; background: var(--red)"></span>
+        </div>
+      </div>
+      <div class="tile__text">
+        <h3>{t.pdf.title}</h3>
+        <p>{t.pdf.sub}</p>
+      </div>
+    </article>
+
+    <article class="tile tile--violet" data-reveal style="--reveal-delay: 0.08s">
+      <p class="tile__eyebrow">{t.ai.eyebrow}</p>
+      <div class="chat" aria-hidden="true">
+        <p class="chat__ask">{t.ai.prompt}</p>
+        <div class="chat__card">
+          <p>{t.ai.proposal}</p>
+          <div><span class="chat__yes">{t.ai.accept}</span><span class="chat__no">{t.ai.refuse}</span></div>
+        </div>
+      </div>
+      <div class="tile__text">
+        <h3>{t.ai.title}</h3>
+        <p>{t.ai.sub}</p>
+      </div>
+    </article>
+  </div>
+</section>
+
+<style>
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr));
+    gap: clamp(14px, 2vw, 24px);
+  }
+  .tile {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    min-width: 0;
+    min-height: clamp(400px, 38vw, 500px);
+    padding: clamp(26px, 3.4vw, 44px);
+    border-radius: clamp(26px, 3vw, 36px);
+    overflow: hidden;
+  }
+  .tile--ink {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .tile--orange {
+    background: var(--orange);
+  }
+  .tile--cyan {
+    background: var(--cyan);
+  }
+  .tile--violet {
+    background: var(--violet);
+    color: var(--paper);
+  }
+  .tile__eyebrow {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .tile__text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: auto;
+  }
+  .tile h3 {
+    font-size: clamp(32px, 3.6vw, 50px);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+  }
+  .tile__text p {
+    max-width: 36ch;
+    font-size: clamp(16px, 1.4vw, 18px);
+  }
+  .tile .btn {
+    margin-top: 8px;
+  }
+
+  /* Légèreté : le chiffre en très grand. */
+  .figure {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(84px, 13vw, 168px);
+    line-height: 0.9;
+    letter-spacing: -0.06em;
+    color: var(--yellow);
+    white-space: nowrap;
+  }
+
+  /* Navigateur : une fenêtre miniature. */
+  .window {
+    width: min(100%, 380px);
+    border-radius: 16px;
+    background: var(--paper);
+    box-shadow: 0 14px 34px rgba(11, 11, 15, 0.22);
+    overflow: hidden;
+  }
+  .window__bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .window__bar i {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--line);
+  }
+  .window__bar span {
+    margin-left: 8px;
+    padding: 3px 12px;
+    border-radius: 999px;
+    background: var(--mist);
+    font-size: 12.5px;
+    font-weight: 500;
+  }
+  .window__body,
+  .pdf__bars {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .window__body {
+    padding: 16px 14px 18px;
+  }
+  .window__body span,
+  .pdf__bars span {
+    height: 16px;
+    border-radius: 8px;
+  }
+
+  /* PDF : la feuille devient des barres. */
+  .pdf {
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 2vw, 22px);
+  }
+  .pdf__sheet {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    width: 96px;
+    padding: 14px 12px 18px;
+    border-radius: 12px;
+    background: var(--paper);
+    box-shadow: 0 14px 34px rgba(11, 11, 15, 0.2);
+  }
+  .pdf__sheet b {
+    font-family: var(--display);
+    font-size: 18px;
+    letter-spacing: -0.02em;
+  }
+  .pdf__sheet i {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--line);
+  }
+  .pdf__sheet i:last-child {
+    width: 60%;
+  }
+  .pdf svg {
+    flex: none;
+  }
+  .pdf__bars {
+    flex: 1;
+    min-width: 0;
+    max-width: 220px;
+    padding: 16px 14px;
+    border-radius: 16px;
+    background: var(--paper);
+    box-shadow: 0 14px 34px rgba(11, 11, 15, 0.2);
+  }
+
+  /* IA : la demande, puis la proposition à valider. */
+  .chat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    color: var(--ink);
+    font-size: 15px;
+  }
+  .chat__ask {
+    align-self: flex-end;
+    max-width: 100%;
+    padding: 10px 16px;
+    border-radius: 18px 18px 4px 18px;
+    background: #ead9f5;
+    font-weight: 500;
+  }
+  .chat__card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: var(--paper);
+    box-shadow: 0 14px 34px rgba(11, 11, 15, 0.25);
+  }
+  .chat__card p {
+    font-weight: 600;
+  }
+  .chat__card div {
+    display: flex;
+    gap: 8px;
+  }
+  .chat__card span {
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+  .chat__yes {
+    background: var(--violet);
+    color: var(--paper);
+  }
+  .chat__no {
+    background: var(--mist);
+  }
+</style>

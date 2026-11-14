@@ -1,0 +1,84 @@
+---
+// Bande décorative : deux rangées de barres qui glissent en sens opposés quand on fait défiler la page.
+// Animation pilotée par le scroll en CSS seul ; sans prise en charge du navigateur, les barres restent fixes.
+import { COLORS } from '../lib/tunnel';
+
+const c = COLORS;
+const rows = [
+  [
+    { w: 180, color: c.violet }, { w: 90, color: c.yellow }, { w: 260, color: c.red }, { w: 120, color: c.cyan },
+    { w: 200, color: c.green }, { w: 70, color: c.blue }, { w: 230, color: c.orange }, { w: 140, color: c.magenta },
+    { w: 190, color: c.violet }, { w: 100, color: c.yellow }, { w: 240, color: c.cyan },
+  ],
+  [
+    { w: 110, color: c.orange }, { w: 240, color: c.blue }, { w: 80, color: c.magenta }, { w: 210, color: c.yellow },
+    { w: 150, color: c.violet }, { w: 270, color: c.green }, { w: 95, color: c.red }, { w: 185, color: c.cyan },
+    { w: 130, color: c.orange }, { w: 220, color: c.blue }, { w: 160, color: c.red },
+  ],
+];
+---
+
+<div class="strip" aria-hidden="true">
+  {
+    rows.map((row, index) => (
+      <div class:list={['strip__row', index === 1 && 'strip__row--back']}>
+        {row.map((bar) => (
+          <span class="strip__bar" style={`width:${bar.w}px;background:${bar.color}`} />
+        ))}
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .strip {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-top: var(--section);
+    overflow: hidden;
+  }
+  .strip__row {
+    display: flex;
+    gap: 14px;
+    width: max-content;
+    margin-left: -6vw;
+  }
+  .strip__row--back {
+    margin-left: -22vw;
+  }
+  .strip__bar {
+    flex: none;
+    height: clamp(26px, 3.4vw, 44px);
+    border-radius: 999px;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .strip__row {
+        animation: strip-forward linear both;
+        animation-timeline: view();
+        animation-range: entry 0% exit 100%;
+      }
+      .strip__row--back {
+        animation-name: strip-back;
+      }
+    }
+  }
+  @keyframes strip-forward {
+    from {
+      transform: translateX(-14vw);
+    }
+    to {
+      transform: translateX(6vw);
+    }
+  }
+  @keyframes strip-back {
+    from {
+      transform: translateX(10vw);
+    }
+    to {
+      transform: translateX(-12vw);
+    }
+  }
+</style>

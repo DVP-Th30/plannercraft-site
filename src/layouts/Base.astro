@@ -1,0 +1,78 @@
+---
+// Gabarit commun : en-tête HTML, polices, et les deux petits scripts de la page.
+import '@fontsource-variable/inter';
+import '@fontsource-variable/inter-tight';
+import '../styles/global.css';
+import type { Copy } from '../i18n';
+import { SITE } from '../config';
+
+interface Props {
+  copy: Copy;
+}
+const { copy } = Astro.props;
+const path = copy.lang === 'fr' ? '/' : '/en/';
+const canonical = new URL(path, SITE.url).href;
+---
+
+<!doctype html>
+<html lang={copy.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{copy.meta.title}</title>
+    <meta name="description" content={copy.meta.description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="fr" href={new URL('/', SITE.url).href} />
+    <link rel="alternate" hreflang="en" href={new URL('/en/', SITE.url).href} />
+    <link rel="alternate" hreflang="x-default" href={new URL('/', SITE.url).href} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png" />
+    <link rel="apple-touch-icon" href="/icon-256.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="PlannerCraft" />
+    <meta property="og:title" content={copy.meta.title} />
+    <meta property="og:description" content={copy.meta.description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={copy.lang === 'fr' ? 'fr_FR' : 'en_US'} />
+    <meta name="theme-color" content="#ffffff" />
+    <script is:inline>
+      // Avant le premier affichage : active la scène animée, sauf si l'utilisateur a demandé moins de mouvement.
+      // Filet de sécurité : si le script de la scène n'a pas démarré après 4 s, on revient à la page statique.
+      (function () {
+        var root = document.documentElement;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        root.classList.add('js-live');
+        setTimeout(function () {
+          if (!window.__pcStage) root.classList.remove('js-live');
+        }, 4000);
+      })();
+    </script>
+  </head>
+  <body>
+    <slot />
+    <script>
+      // Apparition des blocs au scroll, et mise en avant du téléchargement qui correspond au système du visiteur.
+      const root = document.documentElement;
+      const items = document.querySelectorAll<HTMLElement>('[data-reveal]');
+      if (items.length && 'IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-in');
+                observer.unobserve(entry.target);
+              }
+            }
+          },
+          { rootMargin: '0px 0px -12% 0px' },
+        );
+        root.classList.add('reveal-on');
+        items.forEach((item) => observer.observe(item));
+      }
+
+      const platform = navigator.userAgent;
+      const os = /Windows/i.test(platform) ? 'win' : /Mac/i.test(platform) ? 'mac' : /Linux|X11/i.test(platform) ? 'linux' : '';
+      if (os) document.querySelectorAll<HTMLElement>(`[data-os="${os}"]`).forEach((button) => button.classList.add('is-mine'));
+    </script>
+  </body>
+</html>

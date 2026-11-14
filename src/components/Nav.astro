@@ -1,0 +1,80 @@
+---
+// Barre de navigation flottante : deux pilules blanches au-dessus du tunnel.
+import type { Copy } from '../i18n';
+import { SITE } from '../config';
+import Logo from './Logo.astro';
+
+interface Props {
+  copy: Copy;
+}
+const { copy } = Astro.props;
+---
+
+<nav class="nav" aria-label={copy.nav.main}>
+  <a class="pill brand" href="#top">
+    <Logo size="28px" />
+    PlannerCraft
+  </a>
+  <div class="pill links">
+    <a class="link link--wide" href="#why">{copy.nav.why}</a>
+    <a class="link link--wide" href="#ai">{copy.nav.ai}</a>
+    <a class="link link--wide" href="#download">{copy.nav.download}</a>
+    <a class="link" href={SITE.repo}>{copy.nav.github}</a>
+    <a class="link" href={copy.nav.switchHref} hreflang={copy.nav.switchLang} lang={copy.nav.switchLang}>{copy.nav.switchTo}</a>
+  </div>
+</nav>
+
+<style>
+  .nav {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 20;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px var(--gutter);
+    pointer-events: none;
+  }
+  .pill {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    min-height: 46px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 2px 16px rgba(11, 11, 15, 0.12);
+  }
+  .brand {
+    gap: 10px;
+    padding: 0 18px 0 9px;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 17px;
+    text-decoration: none;
+  }
+  .links {
+    gap: 2px;
+    padding: 0 6px;
+  }
+  .link {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 13px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .link:hover {
+    color: var(--violet);
+  }
+  @media (max-width: 760px) {
+    .link--wide {
+      display: none;
+    }
+  }
+</style>

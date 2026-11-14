@@ -1,0 +1,42 @@
+---
+// Le logo de l'application, dessiné en CSS aux proportions de `cargo xtask icon` (dépôt plannercraft).
+interface Props {
+  /** Taille CSS (longueur). */
+  size?: string;
+  label?: string;
+}
+const { size = '28px', label } = Astro.props;
+---
+
+<span class="logo" style={`--logo: ${size}`} role={label ? 'img' : undefined} aria-label={label} aria-hidden={label ? undefined : 'true'}>
+  <span class="logo__bar"></span>
+  <span class="logo__dot"></span>
+</span>
+
+<style>
+  .logo {
+    position: relative;
+    display: block;
+    flex: none;
+    width: var(--logo);
+    height: var(--logo);
+    border-radius: calc(var(--logo) * 0.22);
+    background: #000;
+  }
+  .logo__bar {
+    position: absolute;
+    left: 37.4%;
+    top: 12.4%;
+    width: 50%;
+    height: 75%;
+    background: var(--violet);
+  }
+  .logo__dot {
+    position: absolute;
+    left: 12.4%;
+    top: 68.7%;
+    width: 18.9%;
+    height: 18.9%;
+    background: #fff;
+  }
+</style>

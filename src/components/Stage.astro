@@ -1,0 +1,269 @@
+---
+// Scène d'ouverture : le tunnel de barres autour du logo, puis le grand titre et le planning.
+//
+// Deux modes, choisis par la classe `js-live` posée sur <html> (layouts/Base.astro) :
+// - statique (sans script, ou « moins de mouvement ») : tunnel en SVG, titre et planning en HTML, à la suite ;
+// - animé : la scène fait trois écrans de haut, un canvas collant dessine le tunnel qui se déroule
+//   en planning au fil du scroll (lib/stage.ts). Le SVG reste affiché jusqu'à la première image du canvas.
+import type { Copy } from '../i18n';
+import { SITE } from '../config';
+import { DESIGN_H, DESIGN_W, INK, RINGS, TASKS, arcLength } from '../lib/tunnel';
+import Logo from './Logo.astro';
+
+interface Props {
+  copy: Copy;
+}
+const { copy } = Astro.props;
+const labels = [...copy.gantt.tasks, copy.gantt.milestone];
+const viewBox = `${-DESIGN_W / 2} ${-DESIGN_H / 2} ${DESIGN_W} ${DESIGN_H}`;
+---
+
+<section class="stage" id="top" data-stage data-labels={JSON.stringify(labels)}>
+  <div class="stage__sticky">
+    <canvas class="stage__canvas" aria-hidden="true"></canvas>
+
+    <div class="hero">
+      <svg class="hero__art" viewBox={viewBox} preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        {
+          RINGS.map((ring) => (
+            <g fill="none" stroke-linecap="round" stroke-width={ring.w}>
+              {ring.bars.map((bar) => (
+                <circle
+                  r={ring.r}
+                  transform={`rotate(${bar.start})`}
+                  stroke={bar.color}
+                  stroke-dasharray={`${arcLength(ring.r, bar.sweep).toFixed(1)} 99999`}
+                />
+              ))}
+              {ring.diamond && (
+                <rect
+                  x={-ring.diamond.size / 2}
+                  y={-ring.diamond.size / 2}
+                  width={ring.diamond.size}
+                  height={ring.diamond.size}
+                  transform={`rotate(${ring.diamond.at}) translate(${ring.r} 0) rotate(45)`}
+                  fill={INK}
+                  stroke="none"
+                />
+              )}
+            </g>
+          ))
+        }
+      </svg>
+
+      <div class="hero__content">
+        <Logo size="clamp(84px, calc(var(--u) * 112), 150px)" label="Logo PlannerCraft" />
+        <div class="hero__name">
+          <h1>PlannerCraft</h1>
+          <p class="hero__slogan">{copy.hero.slogan}</p>
+        </div>
+        <div class="hero__actions">
+          <a class="btn" href="#download">
+            {copy.hero.download}
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v14"></path><path d="M6 12l6 6 6-6"></path></svg>
+          </a>
+          <a class="btn btn--ghost" href={SITE.webApp}>{copy.hero.browser}</a>
+        </div>
+        <p class="hero__platforms">{copy.hero.platforms}</p>
+      </div>
+    </div>
+
+    <div class="pitch">
+      <div class="wrap">
+        <h2>{copy.pitch.title}</h2>
+        <p>{copy.pitch.sub}</p>
+      </div>
+    </div>
+
+    <div class="wrap gantt-static">
+      <ol class="gantt" aria-label={copy.gantt.alt}>
+        {
+          TASKS.map((task, index) => (
+            <li class="gantt__row">
+              <span class="gantt__label">{copy.gantt.tasks[index]}</span>
+              <span class="gantt__track">
+                <span class="gantt__bar" style={`left:${task.start}%;width:${task.end - task.start}%;background:${task.color}`} />
+              </span>
+            </li>
+          ))
+        }
+        <li class="gantt__row">
+          <span class="gantt__label">{copy.gantt.milestone}</span>
+          <span class="gantt__track"><span class="gantt__milestone" /></span>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initStage } from '../lib/stage';
+  document.querySelectorAll<HTMLElement>('[data-stage]').forEach(initStage);
+</script>
+
+<style>
+  .stage {
+    position: relative;
+  }
+  .stage__sticky {
+    position: relative;
+  }
+  .stage__canvas {
+    display: none;
+  }
+
+  /* Premier écran. */
+  .hero {
+    position: relative;
+    min-height: max(100svh, 620px);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .hero__art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .hero__content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(14px, calc(var(--u) * 18), 24px);
+    /* Le disque blanc au centre du tunnel fait 546 unités de large. */
+    width: min(calc(var(--u) * 480), 100vw - 2 * var(--gutter));
+    text-align: center;
+    will-change: opacity, transform;
+  }
+  .hero__name {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .hero h1 {
+    font-size: clamp(38px, calc(var(--u) * 46), 62px);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+  .hero__slogan {
+    font-size: clamp(17px, calc(var(--u) * 21), 27px);
+    font-weight: 500;
+    line-height: 1.3;
+    text-wrap: balance;
+  }
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  .hero__platforms {
+    font-size: 13px;
+    color: var(--soft);
+  }
+
+  /* Grand titre. */
+  .pitch {
+    padding-top: var(--section);
+  }
+  .pitch .wrap {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(12px, 1.6vw, 20px);
+  }
+  .pitch h2 {
+    font-size: clamp(46px, 8vw, 112px);
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+  }
+  .pitch p {
+    max-width: 30ch;
+    font-size: clamp(19px, 2vw, 26px);
+    line-height: 1.35;
+    color: var(--muted);
+    text-wrap: balance;
+  }
+
+  /* Planning statique (remplacé par le canvas en mode animé). */
+  .gantt-static {
+    padding-top: clamp(32px, 5vw, 56px);
+  }
+  .gantt {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-bottom: 1px solid var(--line);
+  }
+  .gantt__row {
+    display: flex;
+    align-items: center;
+    height: 54px;
+    border-top: 1px solid var(--line);
+  }
+  .gantt__label {
+    flex: none;
+    width: min(230px, 40%);
+    padding-right: 12px;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .gantt__track {
+    position: relative;
+    flex: 1;
+    height: 30px;
+    margin-right: 30px;
+  }
+  .gantt__bar {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border-radius: 15px;
+  }
+  .gantt__milestone {
+    position: absolute;
+    left: 100%;
+    top: 6px;
+    width: 18px;
+    height: 18px;
+    background: var(--ink);
+    transform: rotate(45deg);
+  }
+
+  /* Mode animé. */
+  :global(.js-live) .stage {
+    height: 300svh;
+  }
+  :global(.js-live) .stage__sticky {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: hidden;
+  }
+  :global(.js-live) .stage__canvas {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  :global(.js-live) .hero {
+    position: absolute;
+    inset: 0;
+    min-height: 0;
+  }
+  :global(.js-live) .stage.is-ready .hero__art {
+    visibility: hidden;
+  }
+  :global(.js-live) .pitch {
+    position: absolute;
+    inset: clamp(84px, 13svh, 150px) 0 auto 0;
+    padding-top: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+  :global(.js-live) .gantt-static {
+    display: none;
+  }
+</style>

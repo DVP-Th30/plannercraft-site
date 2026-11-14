@@ -1,0 +1,30 @@
+---
+// La page entière, pour une langue donnée.
+import type { Lang } from '../i18n';
+import { copies } from '../i18n';
+import Base from '../layouts/Base.astro';
+import Access from './Access.astro';
+import BarStrip from './BarStrip.astro';
+import Download from './Download.astro';
+import Familiar from './Familiar.astro';
+import Nav from './Nav.astro';
+import Stage from './Stage.astro';
+import Tiles from './Tiles.astro';
+
+interface Props {
+  lang: Lang;
+}
+const copy = copies[Astro.props.lang];
+---
+
+<Base copy={copy}>
+  <Nav copy={copy} />
+  <main>
+    <Stage copy={copy} />
+    <Familiar copy={copy} />
+    <BarStrip />
+    <Tiles copy={copy} />
+    <Access copy={copy} />
+    <Download copy={copy} />
+  </main>
+</Base>
