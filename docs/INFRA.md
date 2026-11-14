@@ -15,23 +15,36 @@
 
 `.github/workflows/ci.yml`, sur chaque poussée vers `main` et chaque PR : `pnpm check`, puis `pnpm build`.
 
-## Hébergement : GitHub Pages (pas encore activé)
+## Hébergement : GitHub Pages
 
-`.github/workflows/deploy.yml`, lancement manuel :
+Activé le 2026-11-14, source « GitHub Actions », domaine personnalisé `plannercraft.app`.
+
+`.github/workflows/deploy.yml`, à chaque poussée sur `main` et à la main :
 
 1. construit le site ;
 2. télécharge `plannercraft-<version>-web.tar.gz` depuis la dernière version publiée de l'application et le déplie dans `dist/app/` ; s'il n'existe aucune version publiée, le site part sans `/app/` (avertissement dans le journal) ;
 3. publie `dist` sur GitHub Pages.
 
-État au 2026-11-14 : aucune version publique de l'application (un seul brouillon, `1.0.0-rc.1`). Tant que c'est le cas, les boutons de téléchargement mènent à une page vide et `/app/` n'existe pas.
+Après chaque nouvelle version de l'application, relancer « Deploy » à la main pour mettre `/app/` à jour (D-008).
 
-### À faire pour la mise en ligne
+## DNS
 
-1. Publier une version de l'application.
-2. Dans les réglages du dépôt : Pages, source « GitHub Actions ».
-3. Lancer le workflow « Deploy ».
-4. Domaine personnalisé `plannercraft.app` dans les réglages Pages, puis DNS chez Hostinger (le domaine y est enregistré, serveurs de noms `dns-parking.com`) : quatre enregistrements A et quatre AAAA vers GitHub Pages pour `plannercraft.app`, un CNAME `www` vers `dvp-th30.github.io`. Adresses à reprendre dans la documentation GitHub au moment de la pose.
-5. Cocher « Enforce HTTPS » (obligatoire : le domaine `.app` n'est servi qu'en HTTPS).
-6. Passer `deploy.yml` en déclenchement sur `main` (D-008).
+Domaine enregistré chez Hostinger (expiration 2027-11-13), zone gérée dans hPanel, serveurs de noms `horizon.dns-parking.com` et `orbit.dns-parking.com`. Enregistrements posés à la main le 2026-11-14, TTL 300 :
+
+| Type | Nom | Valeur |
+|---|---|---|
+| A | `@` | `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153` |
+| AAAA | `@` | `2606:50c0:8000::153`, `2606:50c0:8001::153`, `2606:50c0:8002::153`, `2606:50c0:8003::153` |
+| CNAME | `www` | `dvp-th30.github.io` |
+
+Adresses tirées de la documentation GitHub Pages (« Managing a custom domain ») le jour de la pose. Aucun jeton d'API Hostinger n'a été créé : un jeton Hostinger donne accès à tout le compte, sans restriction par domaine.
+
+Le domaine `.app` n'est servi qu'en HTTPS par les navigateurs : le certificat est émis par GitHub après vérification du DNS, puis « Enforce HTTPS » se coche dans les réglages Pages.
+
+## Reste à faire
+
+- Publier une version de l'application : tant qu'il n'y en a pas, les boutons de téléchargement mènent à une page vide et `/app/` n'existe pas (état au 2026-11-14 : un seul brouillon, `1.0.0-rc.1`).
+- Vérifier le domaine dans les réglages du compte GitHub (Pages, « Verified domains ») pour qu'aucun autre compte ne puisse le réclamer.
+- Vérifier que le retour de paiement Stripe et la connexion OpenRouter de l'assistant acceptent `https://plannercraft.app/app/` (D-003).
 
 Aucun secret, aucune variable d'environnement.
