@@ -1,0 +1,54 @@
+# Publie le site sur GitHub Pages, avec la version web de l'application sous /app/.
+# Lancement manuel pour l'instant : GitHub Pages n'est pas encore activé (docs/INFRA.md).
+name: Deploy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm build
+
+      # La version web vient de la dernière version publiée de l'application
+      # (archive `plannercraft-<version>-web.tar.gz`, qui contient un dossier `dist`).
+      - name: Ajouter la version web de l'application
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p web
+          if gh release download --repo DVP-Th30/plannercraft --pattern '*-web.tar.gz' --dir web; then
+            tar xzf web/*-web.tar.gz -C web
+            test -f web/dist/index.html
+            mkdir -p dist/app
+            cp -R web/dist/. dist/app/
+          else
+            echo "::warning::Aucune version publiée ne contient la version web : /app/ ne sera pas servi."
+          fi
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v5
