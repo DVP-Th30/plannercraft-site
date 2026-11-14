@@ -11,6 +11,7 @@ const DEG = Math.PI / 180;
 const clamp01 = (v: number): number => (v < 0 ? 0 : v > 1 ? 1 : v);
 const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
 const easeInOut = (t: number): number => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const easeOut = (t: number): number => 1 - Math.pow(1 - t, 3);
 
 /** Ramène un angle dans ]-π, π]. */
 function wrapAngle(a: number): number {
@@ -19,6 +20,10 @@ function wrapAngle(a: number): number {
   if (r <= -Math.PI) r += 2 * Math.PI;
   return r;
 }
+
+// Entrée au chargement, en secondes : la page part du blanc, les anneaux se dessinent l'un après
+// l'autre du centre vers l'extérieur (chaque barre s'allonge en tournant), puis le texte apparaît.
+const INTRO = { stagger: 0.13, span: 1.2, twist: 0.9, heroDelay: 0.35, heroSpan: 0.9 };
 
 // Jalons de la progression (0 = haut de la scène, 1 = fin de la scène).
 const HERO_FADE = { from: 0.03, span: 0.15 };
@@ -74,7 +79,7 @@ export function initStage(root: HTMLElement): void {
   let shown = 0; // progression affichée, lissée
   let raf = 0;
   let onScreen = true;
-  let ready = false;
+  let intro = 0; // secondes écoulées depuis le début de l'entrée
 
   function layout(): void {
     const rect = sticky!.getBoundingClientRect();
@@ -165,19 +170,24 @@ export function initStage(root: HTMLElement): void {
       ctx!.stroke();
     }
 
-    for (const ring of RINGS) {
+    for (const [index, ring] of RINGS.entries()) {
+      // Entrée : 0 = anneau pas encore là, 1 = anneau complet.
+      const grown = easeOut(clamp01((intro - index * INTRO.stagger) / INTRO.span));
+      if (grown <= 0) continue;
+      const fade = clamp01(grown * 3);
+      const twist = Math.sign(ring.period) * (1 - grown) * INTRO.twist;
       const rot = (360 / ring.period) * time;
       const radius = ring.r * scale;
 
       for (const bar of ring.bars) {
-        const a0 = (bar.start + rot) * DEG;
-        const sweep = bar.sweep * DEG;
+        const a0 = (bar.start + rot) * DEG - twist;
+        const sweep = bar.sweep * DEG * grown;
         ctx!.strokeStyle = bar.color;
 
         if (bar.task === undefined) {
           // Barre qui s'envole : l'anneau grossit et s'efface, comme si on traversait le tunnel.
           if (out >= 1) continue;
-          ctx!.globalAlpha = 1 - clamp01((out - 0.35) / 0.65);
+          ctx!.globalAlpha = fade * (1 - clamp01((out - 0.35) / 0.65));
           ctx!.lineWidth = ring.w * scale * (1 + 1.4 * out);
           ctx!.beginPath();
           ctx!.arc(cx, cy, radius * (1 + 2.4 * out), a0, a0 + sweep);
@@ -195,7 +205,7 @@ export function initStage(root: HTMLElement): void {
         const xe = taskX(task.end);
         // Les bouts arrondis ajoutent une épaisseur à la longueur : on la retire pour tenir entre xs et xe.
         const lengthTo = Math.max(1, xe - xs - chart.barH);
-        ctx!.globalAlpha = 1;
+        ctx!.globalAlpha = fade;
         ctx!.lineWidth = lerp(ring.w * scale, chart.barH, e);
         strokeArc(
           lerp(cx + Math.cos(mid) * radius, (xs + xe) / 2, e),
@@ -207,13 +217,13 @@ export function initStage(root: HTMLElement): void {
       }
 
       if (ring.diamond) {
-        const angle = (ring.diamond.at + rot) * DEG;
+        const angle = (ring.diamond.at + rot) * DEG - twist;
         ctx!.fillStyle = INK;
         ctx!.save();
         if (ring.diamond.milestone) {
           const e = easeInOut(clamp01((p - MORPH.from - TASKS.length * MORPH.stagger) / MORPH.span));
-          const size = lerp(ring.diamond.size * scale, chart.barH * 0.62, e);
-          ctx!.globalAlpha = 1;
+          const size = lerp(ring.diamond.size * scale * grown, chart.barH * 0.62, e);
+          ctx!.globalAlpha = fade;
           ctx!.translate(
             lerp(cx + Math.cos(angle) * radius, chart.x1 + 10, e),
             lerp(cy + Math.sin(angle) * radius, rowY(TASKS.length), e),
@@ -221,9 +231,9 @@ export function initStage(root: HTMLElement): void {
           ctx!.rotate(lerp(wrapAngle(angle + Math.PI / 4), Math.PI / 4, e));
           ctx!.fillRect(-size / 2, -size / 2, size, size);
         } else if (out < 1) {
-          const size = ring.diamond.size * scale * (1 + 1.4 * out);
+          const size = ring.diamond.size * scale * grown * (1 + 1.4 * out);
           const far = radius * (1 + 2.4 * out);
-          ctx!.globalAlpha = 1 - clamp01((out - 0.35) / 0.65);
+          ctx!.globalAlpha = fade * (1 - clamp01((out - 0.35) / 0.65));
           ctx!.translate(cx + Math.cos(angle) * far, cy + Math.sin(angle) * far);
           ctx!.rotate(angle + Math.PI / 4);
           ctx!.fillRect(-size / 2, -size / 2, size, size);
@@ -273,9 +283,10 @@ export function initStage(root: HTMLElement): void {
   }
 
   function applyDom(p: number): void {
+    const heroIn = easeOut(clamp01((intro - INTRO.heroDelay) / INTRO.heroSpan));
     const heroOpacity = 1 - clamp01((p - HERO_FADE.from) / HERO_FADE.span);
-    hero!.style.opacity = heroOpacity.toFixed(3);
-    hero!.style.transform = `scale(${(0.9 + 0.1 * heroOpacity).toFixed(4)})`;
+    hero!.style.opacity = (heroOpacity * heroIn).toFixed(3);
+    hero!.style.transform = `translateY(${((1 - heroIn) * 14).toFixed(1)}px) scale(${(0.9 + 0.1 * heroOpacity).toFixed(4)})`;
     hero!.toggleAttribute('inert', heroOpacity < 0.05);
     const pitchOpacity = clamp01((p - PITCH_IN.from) / PITCH_IN.span);
     pitch!.style.opacity = pitchOpacity.toFixed(3);
@@ -292,14 +303,11 @@ export function initStage(root: HTMLElement): void {
     const dt = Math.min((now - last) / 1000, 0.05);
     last = now;
     time += dt;
+    intro += dt;
     // Lissage exponentiel : la scène suit le scroll sans à-coups, quel que soit le taux d'images.
     shown += (target() - shown) * (1 - Math.exp(-dt * 14));
     draw(shown);
     applyDom(shown);
-    if (!ready) {
-      ready = true;
-      root.classList.add('is-ready');
-    }
     raf = requestAnimationFrame(frame);
   }
 
@@ -315,6 +323,8 @@ export function initStage(root: HTMLElement): void {
 
   layout();
   shown = target();
+  // Page rechargée plus bas que le premier écran : pas d'entrée, la scène est déjà en place.
+  if (shown > 0.02) intro = Number.POSITIVE_INFINITY;
   new ResizeObserver(layout).observe(sticky);
   new ResizeObserver(layout).observe(pitch);
   new IntersectionObserver((entries) => {
