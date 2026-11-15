@@ -28,17 +28,28 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+
+      # Liens de téléchargement directs : version publiée la plus récente de l'application,
+      # pré-versions comprises (src/data/release.json, lu par src/config.ts).
+      - name: Relever la version publiée de l'application
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node scripts/fetch-release.mjs
+          cat src/data/release.json
+
       - run: pnpm check
       - run: pnpm build
 
-      # La version web vient de la dernière version publiée de l'application
+      # La version web vient de la même version publiée de l'application
       # (archive `plannercraft-<version>-web.tar.gz`, qui contient un dossier `dist`).
       - name: Ajouter la version web de l'application
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p web
-          if gh release download --repo DVP-Th30/plannercraft --pattern '*-web.tar.gz' --dir web; then
+          tag="$(node -p "require('./src/data/release.json').tag ?? ''")"
+          if [ -n "$tag" ] && gh release download "$tag" --repo DVP-Th30/plannercraft --pattern '*-web.tar.gz' --dir web; then
             tar xzf web/*-web.tar.gz -C web
             test -f web/dist/index.html
             mkdir -p dist/app

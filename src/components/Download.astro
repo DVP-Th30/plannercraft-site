@@ -1,7 +1,7 @@
 ---
 // Panneau final : les trois téléchargements, la version navigateur, le code source, puis le pied de page.
 import type { Copy } from '../i18n';
-import { SITE } from '../config';
+import { SITE, downloadHref } from '../config';
 import Logo from './Logo.astro';
 
 interface Props {
@@ -27,7 +27,7 @@ const d = copy.download;
         {
           d.os.map((os) => (
             <li>
-              <a class="btn btn--outline-light os" href={SITE.releases} data-os={os.id}>
+              <a class="btn btn--outline-light os" href={downloadHref(os.id)} data-os={os.id}>
                 <span class="os__name">{os.name}</span>
                 <span class="os__detail">{os.detail}</span>
               </a>

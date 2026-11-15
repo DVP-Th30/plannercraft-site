@@ -70,9 +70,21 @@ const canonical = new URL(path, SITE.url).href;
         items.forEach((item) => observer.observe(item));
       }
 
+      // Système du visiteur. Un téléphone ou une tablette n'en a aucun des trois : leur
+      // identité contient pourtant « Mac » (iPhone, iPad) ou « Linux » (Android).
       const platform = navigator.userAgent;
-      const os = /Windows/i.test(platform) ? 'win' : /Mac/i.test(platform) ? 'mac' : /Linux|X11/i.test(platform) ? 'linux' : '';
-      if (os) document.querySelectorAll<HTMLElement>(`[data-os="${os}"]`).forEach((button) => button.classList.add('is-mine'));
+      const handheld = /Android|iPhone|iPad|iPod|Mobile/i.test(platform) || (/Mac/i.test(platform) && navigator.maxTouchPoints > 1);
+      const os = handheld ? '' : /Windows/i.test(platform) ? 'win' : /Mac/i.test(platform) ? 'mac' : /Linux|X11/i.test(platform) ? 'linux' : '';
+      if (os) {
+        const mine = document.querySelectorAll<HTMLAnchorElement>(`a[data-os="${os}"]`);
+        mine.forEach((button) => button.classList.add('is-mine'));
+        // Le bouton principal télécharge directement le fichier du système reconnu ;
+        // sinon il garde son ancre vers les trois téléchargements.
+        const direct = mine[0]?.href;
+        if (direct && !/\/releases(\/tag\/[^/]+)?\/?$/.test(direct)) {
+          document.querySelectorAll<HTMLAnchorElement>('a[data-download]').forEach((button) => (button.href = direct));
+        }
+      }
     </script>
   </body>
 </html>

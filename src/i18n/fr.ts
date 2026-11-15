@@ -51,8 +51,8 @@ export const fr: Copy = {
     light: {
       eyebrow: 'Poids plume',
       title: 'Ultra léger.',
-      sub: '16 Mo à télécharger sous Windows. Pas d’installeur, pas de compte.',
-      figure: '16 Mo',
+      sub: '23 Mo à télécharger sous Windows. Pas d’installeur, pas de compte.',
+      figure: '23 Mo',
     },
     browser: {
       eyebrow: 'En ligne',

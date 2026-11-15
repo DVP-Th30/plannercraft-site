@@ -24,7 +24,7 @@ Direction visuelle A (« tunnel de barres ») et formulations choisies par le pr
 
 Garde-fous : aucune promesse absolue (« tout », « identique »), aucun prix de MS Project, compatibilité annoncée par le XML seulement. Les chiffres viennent du dépôt de l'application :
 
-- « 16 Mo sous Windows » : taille du zip du brouillon `1.0.0-rc.1` (27 octobre 2026). **À remesurer à la sortie** : l'import PDF a été ajouté depuis.
+- « 23 Mo sous Windows » : taille du zip de la bêta publique `1.0.0-rc.2` (23,2 Mo, 15 novembre 2026 ; 16 Mo au brouillon `1.0.0-rc.1` du 27 octobre, avant l'import PDF et la lecture des `.mpp`). À remesurer à chaque version publiée.
 - Crédits de 5 €, 20 € et 50 € : `docs/user/assistant.md` de l'application.
 
 ## D-005 — Scène d'ouverture en canvas 2D, sans bibliothèque d'animation (2026-11-14)
@@ -45,3 +45,15 @@ Le déroulé des barres est une interpolation de cinq grandeurs par barre ; la p
 ## D-008 — Mise en ligne en deux temps (2026-11-14)
 
 Le déploiement (`.github/workflows/deploy.yml`) ne se lance qu'à la main tant que le propriétaire n'a pas validé la page, activé GitHub Pages et posé le DNS. Le passage au déploiement automatique sur `main` se fera à ce moment.
+
+## D-009 — Téléchargements directs, relevés au déploiement (2026-11-15)
+
+Demande du propriétaire pour la bêta publique : un clic sur « Télécharger » doit donner le fichier du système du visiteur.
+
+- `scripts/fetch-release.mjs`, lancé par `deploy.yml` avant la construction, lit la version publiée la plus récente de l'application (pré-versions comprises, brouillons exclus) et écrit `src/data/release.json` : étiquette, page de la version, adresse de chaque fichier (DMG, zip Windows, archive Linux, paquet web). `src/config.ts` en tire `downloadHref(os)`.
+- Chaque bouton de système est un lien direct vers son fichier, valable sans JavaScript. Le bouton principal de l'ouverture garde l'ancre `#download` ; un script lui donne le lien direct du système reconnu (`data-download`, `src/layouts/Base.astro`). Téléphones et tablettes : aucun système reconnu (leur identité contient « Mac » ou « Linux »), le bouton mène aux trois téléchargements.
+- Le fichier versionné `src/data/release.json` ne porte que les liens de repli (page des versions) : la CI et le poste local construisent sans réseau.
+- Écarté : `releases/latest/download/<fichier>` de GitHub. « Latest » ignore les pré-versions, et la bêta en est une (`1.0.0-rc.2`) ; les noms de fichier portent en plus le numéro de version.
+- Écarté : interroger l'API de GitHub depuis le navigateur du visiteur (requête vers un tiers au chargement, limite de débit anonyme).
+- Conséquence : une nouvelle version de l'application n'apparaît sur le site qu'au déploiement suivant (workflow « Deploy »).
+

@@ -53,5 +53,5 @@ Toute phrase affichée vient de `src/i18n/fr.ts` ou `en.ts`. Les libellés des t
 ## Ce qui dépend de l'application
 
 - La capture `src/assets/gantt-fr.png` est une capture de test du dépôt de l'application (1280 × 720, interface française). À remplacer par des captures en haute définition, une par langue.
-- Les liens de téléchargement pointent tous vers la page de la dernière version publiée (`SITE.releases`).
+- Les liens de téléchargement sont directs, un par système (`downloadHref`, `src/config.ts`), relevés au déploiement dans `src/data/release.json` (D-009) ; sans version publiée, ils mènent à la page des versions (`SITE.releases`). Le bouton principal de l'ouverture prend le lien du système du visiteur.
 - La version web est servie sous `/app/` par le déploiement (`docs/INFRA.md`).
