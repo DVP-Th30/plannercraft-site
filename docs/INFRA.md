@@ -19,8 +19,8 @@
 
 `.github/workflows/deploy.yml`, lancement manuel :
 
-1. construit le site ;
-2. télécharge `plannercraft-<version>-web.tar.gz` depuis la dernière version publiée de l'application et le déplie dans `dist/app/` ; s'il n'existe aucune version publiée, le site part sans `/app/` (avertissement dans le journal) ;
+1. relève la version publiée la plus récente de l'application, pré-versions comprises (`scripts/fetch-release.mjs`, D-009), puis construit le site ;
+2. télécharge `plannercraft-<version>-web.tar.gz` de cette même version et le déplie dans `dist/app/` ; s'il n'existe aucune version publiée, le site part sans `/app/` (avertissement dans le journal) ;
 3. publie `dist` sur GitHub Pages.
 
 État au 2026-11-14 : aucune version publique de l'application (un seul brouillon, `1.0.0-rc.1`). Tant que c'est le cas, les boutons de téléchargement mènent à une page vide et `/app/` n'existe pas.

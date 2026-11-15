@@ -51,8 +51,8 @@ export const en: Copy = {
     light: {
       eyebrow: 'Featherweight',
       title: 'Ultra light.',
-      sub: 'A 16 MB download on Windows. No installer, no account.',
-      figure: '16 MB',
+      sub: 'A 23 MB download on Windows. No installer, no account.',
+      figure: '23 MB',
     },
     browser: {
       eyebrow: 'Online',
