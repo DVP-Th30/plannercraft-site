@@ -21,11 +21,13 @@
 | `src/components/Download.astro` | Téléchargements, version navigateur, pied de page |
 | `src/components/Nav.astro`, `Logo.astro` | Navigation flottante, logo dessiné en CSS |
 | `src/layouts/Base.astro` | En-tête HTML, balises de référencement, deux petits scripts |
+| `src/pages/robots.txt.ts` | `robots.txt` : tout est ouvert, avec l'adresse du plan du site |
 | `src/i18n/` | Tous les textes (`fr.ts`, `en.ts`), typés par `Copy` |
 | `src/lib/tunnel.ts` | Géométrie du tunnel et du planning d'arrivée (source unique) |
 | `src/lib/stage.ts` | Rendu canvas et progression au scroll |
 | `src/config.ts` | Adresses : dépôt, page des versions, version web |
 | `src/styles/global.css` | Jetons (couleurs, polices, espacements) et bases |
+| `scripts/og-image.mjs` | Fabrique les images de partage `public/og-fr.png` et `og-en.png` (`pnpm og`) |
 
 ## La scène d'ouverture
 
@@ -49,6 +51,15 @@ Le planning s'aligne sur la colonne de texte du titre, dont `stage.ts` lit la po
 ## Les textes
 
 Toute phrase affichée vient de `src/i18n/fr.ts` ou `en.ts`. Les libellés des tâches du planning passent au canvas par l'attribut `data-labels` de `.stage`.
+
+## Référencement
+
+Tout est dans `src/layouts/Base.astro`, sauf le plan du site et `robots.txt` (D-010).
+
+- **Balises** : titre et description par langue (`meta` dans `src/i18n`), adresse canonique, liens `hreflang` entre les deux langues.
+- **Plan du site** : `sitemap-index.xml`, produit par `@astrojs/sitemap` avec les deux langues de chaque page (`astro.config.mjs`). `robots.txt` y renvoie.
+- **Aperçu de partage** (Open Graph) : une image de 1200 × 630 par langue, le tunnel autour du logo, du nom et du slogan. `pnpm og` les refabrique à partir de `src/lib/tunnel.ts` et de `src/i18n` ; à relancer quand le slogan, le logo ou le tunnel changent, puis versionner les deux PNG. L'outil demande Google Chrome sur le poste.
+- **Données structurées** (JSON-LD) : le site (`WebSite`) et le logiciel (`SoftwareApplication` : systèmes, gratuité, dépôt, version relevée au déploiement). Elles suivent la règle du texte : rien qui ne soit vérifiable dans le dépôt de l'application.
 
 ## Ce qui dépend de l'application
 
