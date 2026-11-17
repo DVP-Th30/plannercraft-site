@@ -6,5 +6,11 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
   site: 'https://plannercraft.app',
   // Le plan du site déclare les deux langues de chaque page (balises hreflang).
-  integrations: [sitemap({ i18n: { defaultLocale: 'fr', locales: { fr: 'fr', en: 'en' } } })],
+  integrations: [
+    sitemap({
+      i18n: { defaultLocale: 'fr', locales: { fr: 'fr', en: 'en' } },
+      // Pages de retour de paiement : hors référencement (D-012).
+      filter: (page) => !page.includes('/credits/'),
+    }),
+  ],
 });

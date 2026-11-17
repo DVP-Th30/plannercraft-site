@@ -98,6 +98,14 @@ export const en: Copy = {
     browser: 'Open in browser',
     source: 'Source code on GitHub',
   },
+  payment: {
+    successTitle: 'Payment received.',
+    successSub: 'Your credits are added to your account within seconds. Go back to PlannerCraft: the balance refreshes.',
+    cancelTitle: 'Payment cancelled.',
+    cancelSub: 'No credits were bought and nothing was charged. You can close this page and go back to PlannerCraft.',
+    webApp: 'Paying from the browser? Open the web version',
+    home: 'Back to the home page',
+  },
   footer: {
     legal:
       'MIT or Apache 2.0 license. Microsoft Project is a trademark of Microsoft Corporation; PlannerCraft is an independent project.',

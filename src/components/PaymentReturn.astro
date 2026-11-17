@@ -1,0 +1,97 @@
+---
+// Page de retour de Stripe pour un achat lancé depuis l'application de bureau (D-012).
+// Le relais ne connaît pas la langue de l'application : la page parle français puis anglais.
+import { copies } from '../i18n';
+import { SITE } from '../config';
+import Base from '../layouts/Base.astro';
+import Logo from './Logo.astro';
+
+interface Props {
+  outcome: 'success' | 'cancel';
+}
+const { outcome } = Astro.props;
+const fr = copies.fr.payment;
+const blocks = [copies.fr, copies.en].map((copy) => ({
+  lang: copy.lang,
+  title: outcome === 'success' ? copy.payment.successTitle : copy.payment.cancelTitle,
+  sub: outcome === 'success' ? copy.payment.successSub : copy.payment.cancelSub,
+  webApp: copy.payment.webApp,
+  home: copy.payment.home,
+  homeHref: copy.lang === 'fr' ? '/' : '/en/',
+}));
+// Achat fait dans le navigateur : la version web reconnaît le retour à cette adresse.
+const webHref = `${SITE.webApp}credits/${outcome}`;
+---
+
+<Base copy={copies.fr} utility={{ title: (outcome === 'success' ? fr.successTitle : fr.cancelTitle).replace(/\.$/, '') }}>
+  <main class="return">
+    <div class="wrap">
+      <Logo size="56px" label="PlannerCraft" />
+      {
+        blocks.map((b) => (
+          <section class="return__block" lang={b.lang}>
+            <h1>{b.title}</h1>
+            <p class="lede">{b.sub}</p>
+            <p class="return__links">
+              <a href={webHref}>{b.webApp}</a>
+              <span aria-hidden="true">·</span>
+              <a href={b.homeHref}>{b.home}</a>
+            </p>
+          </section>
+        ))
+      }
+      <div class="return__bars" aria-hidden="true">
+        <span style="width: 120px; background: var(--violet)" />
+        <span style="width: 64px; background: var(--yellow)" />
+        <span style="width: 168px; background: var(--green)" />
+      </div>
+    </div>
+  </main>
+</Base>
+
+<style>
+  .return {
+    min-height: 100svh;
+    display: grid;
+    align-items: center;
+    padding-block: 64px;
+  }
+  .return__block {
+    margin-top: 40px;
+  }
+  .return__block + .return__block {
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+  }
+  h1 {
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    margin-bottom: 14px;
+  }
+  .return__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    margin-top: 18px;
+    color: var(--soft);
+    font-size: 15px;
+  }
+  .return__links a {
+    color: var(--violet);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .return__links a:hover {
+    text-decoration: underline;
+  }
+  .return__bars {
+    display: flex;
+    gap: 10px;
+    margin-top: 48px;
+  }
+  .return__bars span {
+    height: 18px;
+    border-radius: 999px;
+  }
+</style>

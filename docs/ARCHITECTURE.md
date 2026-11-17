@@ -22,6 +22,7 @@
 | `src/components/Nav.astro`, `Logo.astro` | Navigation flottante, logo dessiné en CSS |
 | `src/layouts/Base.astro` | En-tête HTML, balises de référencement, deux petits scripts |
 | `src/pages/robots.txt.ts` | `robots.txt` : tout est ouvert, avec l'adresse du plan du site |
+| `src/pages/credits/success.astro`, `cancel.astro`, `src/components/PaymentReturn.astro` | Retours de Stripe d'un achat fait depuis l'application de bureau (D-012), hors référencement |
 | `src/i18n/` | Tous les textes (`fr.ts`, `en.ts`), typés par `Copy` |
 | `src/lib/tunnel.ts` | Géométrie du tunnel et du planning d'arrivée (source unique) |
 | `src/lib/stage.ts` | Rendu canvas et progression au scroll |

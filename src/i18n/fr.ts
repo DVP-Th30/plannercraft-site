@@ -98,6 +98,14 @@ export const fr: Copy = {
     browser: 'Ouvrir dans le navigateur',
     source: 'Code source sur GitHub',
   },
+  payment: {
+    successTitle: 'Paiement reçu.',
+    successSub: 'Vos crédits s’ajoutent à votre compte dans quelques secondes. Revenez dans PlannerCraft : le solde s’actualise.',
+    cancelTitle: 'Paiement annulé.',
+    cancelSub: 'Aucun crédit n’a été acheté et rien n’a été débité. Vous pouvez fermer cette page et revenir dans PlannerCraft.',
+    webApp: 'Vous payiez depuis le navigateur ? Ouvrir la version web',
+    home: 'Retour à l’accueil',
+  },
   footer: {
     legal:
       'Licence MIT ou Apache 2.0. Microsoft Project est une marque de Microsoft Corporation ; PlannerCraft est un projet indépendant.',

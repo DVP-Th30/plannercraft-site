@@ -21,6 +21,8 @@ export interface Copy {
   };
   access: { title: string; sub: string; account: { title: string; sub: string }; key: { title: string; sub: string } };
   download: { title: string; sub: string; os: { name: string; detail: string; id: 'mac' | 'win' | 'linux' }[]; browser: string; source: string };
+  /** Pages de retour de Stripe pour un achat fait depuis l'application de bureau (D-012). */
+  payment: { successTitle: string; successSub: string; cancelTitle: string; cancelSub: string; webApp: string; home: string };
   footer: { legal: string };
 }
 

@@ -81,3 +81,11 @@ Le relais envoie l'utilisateur de la version web vers `https://plannercraft.app/
 - Écarté : des dossiers `login/index.html` (GitHub ajoute alors une barre finale, `/app/login/`, et l'application ne reconnaît plus `/credits/success`).
 - L'application de bureau n'est pas concernée : elle se connecte par code et suit le paiement par le solde.
 
+## D-012 — Pages de retour de paiement pour l'application de bureau (2026-11-17)
+
+Un achat de crédits lancé depuis l'application de bureau ouvre Stripe dans le navigateur. Au retour, il tombait sur la version web (`/app/credits/success`), où l'utilisateur n'est pas connecté. Le relais renvoie désormais un achat du bureau vers `/credits/success/` ou `/credits/cancel/` du site (décision D10 du relais) : une page simple, « Paiement reçu, revenez dans PlannerCraft », avec un lien vers la version web pour qui payait depuis le navigateur avec une version de l'application qui ne précise pas son origine.
+
+- Une seule page en français puis en anglais : le relais ne connaît pas la langue de l'application.
+- Hors référencement : `noindex`, exclues du plan du site, sans aperçu de partage (`utility` dans `Base.astro`).
+- Les crédits arrivent par le webhook de Stripe, jamais par cette page : elle n'affiche que ce que Stripe a dit au navigateur.
+
