@@ -11,6 +11,11 @@
 - `pnpm dev` sert `http://localhost:4321`. Astro détache le serveur : `pnpm astro dev stop` l'arrête, `pnpm astro dev logs` montre ses journaux.
 - Télémétrie d'Astro désactivée sur le poste (`pnpm astro telemetry disable`).
 
+## Référencement
+
+- **Google Search Console** : propriété « Domaine » `plannercraft.app` (couvre `www` et `/app/`), créée le 2026-11-16 dans le compte Google `pricebox.fr` du propriétaire. Preuve de propriété : un enregistrement TXT `google-site-verification=…` à la racine de la zone DNS (Hostinger). Le retirer fait perdre la propriété.
+- **Plan du site** déclaré : `https://plannercraft.app/sitemap-index.xml`.
+
 ## Intégration continue
 
 `.github/workflows/ci.yml`, sur chaque poussée vers `main` et chaque PR : `pnpm check`, puis `pnpm build`.
@@ -21,8 +26,8 @@ Activé le 2026-11-14, source « GitHub Actions », domaine personnalisé `plann
 
 `.github/workflows/deploy.yml`, à chaque poussée sur `main` et à la main :
 
-1. construit le site ;
-2. télécharge `plannercraft-<version>-web.tar.gz` depuis la dernière version publiée de l'application et le déplie dans `dist/app/` ; s'il n'existe aucune version publiée, le site part sans `/app/` (avertissement dans le journal) ;
+1. relève la version publiée la plus récente de l'application, pré-versions comprises (`scripts/fetch-release.mjs`, D-009), puis construit le site ;
+2. télécharge `plannercraft-<version>-web.tar.gz` de cette même version et le déplie dans `dist/app/` ; s'il n'existe aucune version publiée, le site part sans `/app/` (avertissement dans le journal) ;
 3. publie `dist` sur GitHub Pages.
 
 Après chaque nouvelle version de l'application, relancer « Deploy » à la main pour mettre `/app/` à jour (D-008).

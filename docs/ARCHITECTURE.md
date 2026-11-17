@@ -21,11 +21,13 @@
 | `src/components/Download.astro` | Téléchargements, version navigateur, pied de page |
 | `src/components/Nav.astro`, `Logo.astro` | Navigation flottante, logo dessiné en CSS |
 | `src/layouts/Base.astro` | En-tête HTML, balises de référencement, deux petits scripts |
+| `src/pages/robots.txt.ts` | `robots.txt` : tout est ouvert, avec l'adresse du plan du site |
 | `src/i18n/` | Tous les textes (`fr.ts`, `en.ts`), typés par `Copy` |
 | `src/lib/tunnel.ts` | Géométrie du tunnel et du planning d'arrivée (source unique) |
 | `src/lib/stage.ts` | Rendu canvas et progression au scroll |
 | `src/config.ts` | Adresses : dépôt, page des versions, version web |
 | `src/styles/global.css` | Jetons (couleurs, polices, espacements) et bases |
+| `scripts/og-image.mjs` | Fabrique les images de partage `public/og-fr.png` et `og-en.png` (`pnpm og`) |
 
 ## La scène d'ouverture
 
@@ -36,7 +38,7 @@ Le tunnel est fait de sept anneaux de barres courbes. Rayons et épaisseurs croi
 - **statique** (pas de JavaScript, ou préférence « moins de mouvement ») : le tunnel est un SVG généré à la construction, suivi du titre et d'un planning en HTML ;
 - **animé** : `.stage` fait trois écrans de haut et contient un bloc collant d'un écran. Un canvas 2D y dessine le tunnel ; la position de scroll dans `.stage` donne une progression de 0 à 1.
 
-Le SVG reste affiché jusqu'à la première image du canvas (classe `is-ready`), pour qu'il n'y ait pas d'écran vide au chargement. Si le script n'a pas démarré après 4 s, `js-live` est retirée et la page revient au mode statique.
+**L'entrée.** En mode animé, le premier écran part du blanc. Les anneaux se dessinent l'un après l'autre du centre vers l'extérieur (chaque barre s'allonge en tournant), puis le logo et le texte apparaissent : environ 2 s en tout (constante `INTRO` de `stage.ts`). Si la page est rechargée plus bas que le premier écran, l'entrée est sautée. Le SVG ne sert donc qu'au mode statique ; si le script n'a pas démarré après 4 s, `js-live` est retirée et la page y revient.
 
 **Le déroulé.** Chaque barre est un arc de cercle décrit par cinq grandeurs : milieu, direction, longueur, courbure, épaisseur. Dans le tunnel la courbure vaut 1 / rayon ; dans le planning elle vaut 0. `stage.ts` interpole ces grandeurs : l'arc s'ouvre et s'aplatit jusqu'à devenir une barre droite.
 
@@ -50,8 +52,17 @@ Le planning s'aligne sur la colonne de texte du titre, dont `stage.ts` lit la po
 
 Toute phrase affichée vient de `src/i18n/fr.ts` ou `en.ts`. Les libellés des tâches du planning passent au canvas par l'attribut `data-labels` de `.stage`.
 
+## Référencement
+
+Tout est dans `src/layouts/Base.astro`, sauf le plan du site et `robots.txt` (D-010).
+
+- **Balises** : titre et description par langue (`meta` dans `src/i18n`), adresse canonique, liens `hreflang` entre les deux langues.
+- **Plan du site** : `sitemap-index.xml`, produit par `@astrojs/sitemap` avec les deux langues de chaque page (`astro.config.mjs`). `robots.txt` y renvoie.
+- **Aperçu de partage** (Open Graph) : une image de 1200 × 630 par langue, le tunnel autour du logo, du nom et du slogan. `pnpm og` les refabrique à partir de `src/lib/tunnel.ts` et de `src/i18n` ; à relancer quand le slogan, le logo ou le tunnel changent, puis versionner les deux PNG. L'outil demande Google Chrome sur le poste.
+- **Données structurées** (JSON-LD) : le site (`WebSite`) et le logiciel (`SoftwareApplication` : systèmes, gratuité, dépôt, version relevée au déploiement). Elles suivent la règle du texte : rien qui ne soit vérifiable dans le dépôt de l'application.
+
 ## Ce qui dépend de l'application
 
 - La capture `src/assets/gantt-fr.png` est une capture de test du dépôt de l'application (1280 × 720, interface française). À remplacer par des captures en haute définition, une par langue.
-- Les liens de téléchargement pointent tous vers la page de la dernière version publiée (`SITE.releases`).
+- Les liens de téléchargement sont directs, un par système (`downloadHref`, `src/config.ts`), relevés au déploiement dans `src/data/release.json` (D-009) ; sans version publiée, ils mènent à la page des versions (`SITE.releases`). Le bouton principal de l'ouverture prend le lien du système du visiteur.
 - La version web est servie sous `/app/` par le déploiement (`docs/INFRA.md`).
