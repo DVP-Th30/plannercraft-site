@@ -11,6 +11,11 @@
 - `pnpm dev` sert `http://localhost:4321`. Astro détache le serveur : `pnpm astro dev stop` l'arrête, `pnpm astro dev logs` montre ses journaux.
 - Télémétrie d'Astro désactivée sur le poste (`pnpm astro telemetry disable`).
 
+## Référencement
+
+- **Google Search Console** : propriété « Domaine » `plannercraft.app` (couvre `www` et `/app/`), créée le 2026-11-16 dans le compte Google `pricebox.fr` du propriétaire. Preuve de propriété : un enregistrement TXT `google-site-verification=…` à la racine de la zone DNS (Hostinger). Le retirer fait perdre la propriété.
+- **Plan du site** déclaré : `https://plannercraft.app/sitemap-index.xml`.
+
 ## Intégration continue
 
 `.github/workflows/ci.yml`, sur chaque poussée vers `main` et chaque PR : `pnpm check`, puis `pnpm build`.

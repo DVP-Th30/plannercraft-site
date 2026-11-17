@@ -57,3 +57,13 @@ Demande du propriétaire pour la bêta publique : un clic sur « Télécharger �
 - Écarté : interroger l'API de GitHub depuis le navigateur du visiteur (requête vers un tiers au chargement, limite de débit anonyme).
 - Conséquence : une nouvelle version de l'application n'apparaît sur le site qu'au déploiement suivant (workflow « Deploy »).
 
+## D-010 — Référencement : ce que la page déclare aux moteurs (2026-11-16)
+
+Demande du propriétaire : faire référencer le site.
+
+- `robots.txt` ouvre tout le site et donne l'adresse du plan du site. La version web sous `/app/` reste ouverte elle aussi : c'est une application, les moteurs n'y trouvent presque rien à lire, et rien ne justifie de la leur interdire.
+- Les données structurées annoncent le logiciel à 0 € : il est gratuit, et les crédits de l'assistant sont un achat à part, facultatif. Pas de note ni d'avis : il n'en existe pas.
+- Images de partage fabriquées sur le poste et versionnées, plutôt qu'à chaque construction : la CI n'a pas à embarquer un navigateur pour deux images qui changent rarement.
+- Écarté : rendre l'image avec `sharp` à partir d'un SVG. Le texte dépendrait des polices installées sur la machine qui construit.
+- Écarté : modifier le titre ou la description pour y placer d'autres mots-clés. Ce texte a été validé par le propriétaire (D-004) ; une retouche se décide avec lui.
+- Écarté pour l'instant : IndexNow (clé publique à héberger et appel à chaque déploiement) pour un site de deux pages ; la déclaration du plan du site aux moteurs suffit (`docs/INFRA.md`).

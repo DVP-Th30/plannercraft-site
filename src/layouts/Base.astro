@@ -5,6 +5,7 @@ import '@fontsource-variable/inter-tight';
 import '../styles/global.css';
 import type { Copy } from '../i18n';
 import { SITE } from '../config';
+import release from '../data/release.json';
 
 interface Props {
   copy: Copy;
@@ -12,6 +13,37 @@ interface Props {
 const { copy } = Astro.props;
 const path = copy.lang === 'fr' ? '/' : '/en/';
 const canonical = new URL(path, SITE.url).href;
+// Image de partage : une par langue, fabriquée par `pnpm og` (scripts/og-image.mjs).
+const shareImage = new URL(`/og-${copy.lang}.png`, SITE.url).href;
+const shareAlt = `PlannerCraft — ${copy.hero.slogan}`;
+
+// Données structurées pour les moteurs de recherche. Mêmes garde-fous que le texte de la page :
+// rien qui ne soit vérifiable dans le dépôt de l'application (docs/DECISIONS.md, D-010).
+const home = new URL('/', SITE.url).href;
+const structured = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'WebSite', '@id': `${home}#site`, name: 'PlannerCraft', url: home, inLanguage: ['fr', 'en'] },
+    {
+      '@type': 'SoftwareApplication',
+      '@id': `${canonical}#app`,
+      name: 'PlannerCraft',
+      url: canonical,
+      description: copy.meta.description,
+      inLanguage: copy.lang,
+      image: shareImage,
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'macOS, Windows, Linux',
+      ...(release.version ? { softwareVersion: release.version } : {}),
+      downloadUrl: `${canonical}#download`,
+      sameAs: SITE.repo,
+      // Le logiciel est gratuit ; les crédits de l'assistant sont un achat à part, facultatif.
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+    },
+  ],
+};
+// `<` échappé : le texte ne peut pas refermer la balise <script>.
+const structuredJson = JSON.stringify(structured).replace(/</g, '\\u003c');
 ---
 
 <!doctype html>
@@ -34,6 +66,13 @@ const canonical = new URL(path, SITE.url).href;
     <meta property="og:description" content={copy.meta.description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content={copy.lang === 'fr' ? 'fr_FR' : 'en_US'} />
+    <meta property="og:locale:alternate" content={copy.lang === 'fr' ? 'en_US' : 'fr_FR'} />
+    <meta property="og:image" content={shareImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={shareAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" is:inline set:html={structuredJson} />
     <meta name="theme-color" content="#ffffff" />
     <script is:inline>
       // Avant le premier affichage : active la scène animée, sauf si l'utilisateur a demandé moins de mouvement.
