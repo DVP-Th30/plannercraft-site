@@ -57,6 +57,8 @@ jobs:
             test -f web/dist/index.html
             mkdir -p dist/app
             cp -R web/dist/. dist/app/
+            # Adresses de retour du relais (connexion, paiement) : D-011.
+            node scripts/app-entries.mjs dist/app
           else
             echo "::warning::Aucune version publiée ne contient la version web : /app/ ne sera pas servi."
           fi

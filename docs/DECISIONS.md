@@ -71,3 +71,13 @@ Demande du propriétaire : faire référencer le site.
 - Écarté : rendre l'image avec `sharp` à partir d'un SVG. Le texte dépendrait des polices installées sur la machine qui construit.
 - Écarté : modifier le titre ou la description pour y placer d'autres mots-clés. Ce texte a été validé par le propriétaire (D-004) ; une retouche se décide avec lui.
 - Écarté pour l'instant : IndexNow (clé publique à héberger et appel à chaque déploiement) pour un site de deux pages ; la déclaration du plan du site aux moteurs suffit (`docs/INFRA.md`).
+
+## D-011 — Adresses de retour du relais pour la version web (2026-11-17)
+
+Le relais envoie l'utilisateur de la version web vers `https://plannercraft.app/app/login?token=…` (lien de connexion) et `…/app/credits/success` ou `…/app/credits/cancel` (retour de Stripe). L'application lit ces chemins au démarrage, mais GitHub Pages n'avait aucun fichier à ces adresses : 404.
+
+- Le déploiement écrit `app/login.html`, `app/credits/success.html` et `app/credits/cancel.html`, copies de `app/index.html` avec `<base href="/app/">` (`scripts/app-entries.mjs`). GitHub Pages sert `login.html` pour `/app/login` sans redirection, donc le chemin reste celui que l'application attend ; la balise `<base>` garde les fichiers de l'application résolus sous `/app/`.
+- Écarté : une page `404.html` qui chargerait l'application (renvoie un code 404, et tout chemin inconnu du site ouvrirait l'application).
+- Écarté : des dossiers `login/index.html` (GitHub ajoute alors une barre finale, `/app/login/`, et l'application ne reconnaît plus `/credits/success`).
+- L'application de bureau n'est pas concernée : elle se connecte par code et suit le paiement par le solde.
+
