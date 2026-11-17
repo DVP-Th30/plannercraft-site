@@ -48,7 +48,6 @@ Le domaine `.app` n'est servi qu'en HTTPS par les navigateurs : le certificat es
 
 ## Reste à faire
 
-- Publier une version de l'application : tant qu'il n'y en a pas, les boutons de téléchargement mènent à une page vide et `/app/` n'existe pas (état au 2026-11-14 : un seul brouillon, `1.0.0-rc.1`).
 - Vérifier le domaine dans les réglages du compte GitHub (Pages, « Verified domains ») pour qu'aucun autre compte ne puisse le réclamer.
 - Vérifier que le retour de paiement Stripe et la connexion OpenRouter de l'assistant acceptent `https://plannercraft.app/app/` (D-003).
 
