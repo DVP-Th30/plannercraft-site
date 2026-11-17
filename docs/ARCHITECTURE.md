@@ -38,7 +38,7 @@ Le tunnel est fait de sept anneaux de barres courbes. Rayons et épaisseurs croi
 - **statique** (pas de JavaScript, ou préférence « moins de mouvement ») : le tunnel est un SVG généré à la construction, suivi du titre et d'un planning en HTML ;
 - **animé** : `.stage` fait trois écrans de haut et contient un bloc collant d'un écran. Un canvas 2D y dessine le tunnel ; la position de scroll dans `.stage` donne une progression de 0 à 1.
 
-Le SVG reste affiché jusqu'à la première image du canvas (classe `is-ready`), pour qu'il n'y ait pas d'écran vide au chargement. Si le script n'a pas démarré après 4 s, `js-live` est retirée et la page revient au mode statique.
+**L'entrée.** En mode animé, le premier écran part du blanc. Les anneaux se dessinent l'un après l'autre du centre vers l'extérieur (chaque barre s'allonge en tournant), puis le logo et le texte apparaissent : environ 2 s en tout (constante `INTRO` de `stage.ts`). Si la page est rechargée plus bas que le premier écran, l'entrée est sautée. Le SVG ne sert donc qu'au mode statique ; si le script n'a pas démarré après 4 s, `js-live` est retirée et la page y revient.
 
 **Le déroulé.** Chaque barre est un arc de cercle décrit par cinq grandeurs : milieu, direction, longueur, courbure, épaisseur. Dans le tunnel la courbure vaut 1 / rayon ; dans le planning elle vaut 0. `stage.ts` interpole ces grandeurs : l'arc s'ouvre et s'aplatit jusqu'à devenir une barre droite.
 
