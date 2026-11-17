@@ -1,8 +1,11 @@
 # Publie le site sur GitHub Pages, avec la version web de l'application sous /app/.
-# Lancement manuel pour l'instant : GitHub Pages n'est pas encore activé (docs/INFRA.md).
+# À chaque poussée sur main, et à la main : à relancer après chaque nouvelle version
+# de l'application pour mettre /app/ à jour (docs/INFRA.md).
 name: Deploy
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:

@@ -44,7 +44,11 @@ Le déroulé des barres est une interpolation de cinq grandeurs par barre ; la p
 
 ## D-008 — Mise en ligne en deux temps (2026-11-14)
 
-Le déploiement (`.github/workflows/deploy.yml`) ne se lance qu'à la main tant que le propriétaire n'a pas validé la page, activé GitHub Pages et posé le DNS. Le passage au déploiement automatique sur `main` se fera à ce moment.
+Le déploiement ne se lançait qu'à la main tant que le propriétaire n'avait pas validé la page. Après son feu vert, le 2026-11-14 : GitHub Pages activé, domaine `plannercraft.app` déclaré, DNS posé chez Hostinger, et `deploy.yml` se déclenche désormais à chaque poussée sur `main`.
+
+La version web sous `/app/` n'est rafraîchie qu'à un déploiement du site : après une nouvelle version de l'application, relancer « Deploy » à la main.
+
+- Écarté pour l'instant : un déclenchement depuis le dépôt de l'application (il faudrait un jeton entre les deux dépôts) ou un déploiement planifié chaque nuit (des runs pour rien la plupart du temps).
 
 ## D-009 — Téléchargements directs, relevés au déploiement (2026-11-15)
 
